@@ -7,7 +7,7 @@
   ============================================================
   مقطع التقاط الأخطاء — ضعه في reading_app.html
   ============================================================
-  أين: مباشرة بعد وسم <head> مباشرة، قبل أي كود JavaScript أو CSS آخر.
+  أين: مباشرة بعد وسم <head> مباشرة، قبل أي <script> أو <style> آخر.
        يجب أن يكون الأول حتى يلتقط الأخطاء التي تحدث أثناء التحميل.
 
   ماذا يفعل:
@@ -445,45 +445,6 @@ body>div:first-of-type a{border:0!important;background:#fff!important;color:#315
 #readingLeftSidebar .moreToolsRow{
   margin-top:8px;
 }
-/* Reading playback controls moved to the left rail under "نصوصي". */
-#readingLeftSidebar .left-reading-actions{
-  margin-top:12px;
-  padding-top:12px;
-  border-top:1px solid #d8e8f0;
-}
-#readingLeftSidebar .left-reading-actions .actions-title{
-  font-size:.88rem;
-  font-weight:800;
-  color:#31576c;
-  text-align:center;
-  margin:0 0 8px;
-}
-#readingLeftSidebar .left-reading-actions .mode-strip,
-#readingLeftSidebar .left-reading-actions .pause-bar{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:7px;
-  margin:7px 0 0;
-}
-#readingLeftSidebar .left-reading-actions .mode-strip button,
-#readingLeftSidebar .left-reading-actions .pause-bar button{
-  width:100%;
-  min-height:44px;
-  font-size:.82rem;
-  border-radius:14px;
-  box-shadow:none;
-}
-#readingLeftSidebar .left-reading-actions .mode-strip button.active{
-  background:#4f9fcb!important;
-  border-color:#3f81a5!important;
-  color:#fff;
-}
-#readingLeftSidebar .left-reading-actions .pause-bar button{
-  background:#fff;
-}
-#readingLeftSidebar .left-reading-actions .pause-bar button:last-child{
-  display:none;
-}
 #readingRightSidebar .v10-tools{
   max-width:none;
   margin:0;
@@ -507,44 +468,15 @@ body>div:first-of-type a{border:0!important;background:#fff!important;color:#315
   padding:9px;
 }
 #readingCenter .more-toggle-row{display:none!important}
-#readingCenter{
-  max-width:900px;
-  justify-self:center;
-}
 #readingCenter .card{
   width:100%;
-  min-height:360px;
+  min-height:270px;
   display:flex;
   flex-direction:column;
   justify-content:center;
-  padding:34px 34px 30px;
-  border:2px solid #d8e8f0;
-  background:linear-gradient(180deg,#fffdf8 0%,#fff9ef 100%);
-  box-shadow:0 16px 34px rgba(40,75,95,.10);
-}
-#readingCenter .card .counter{
-  font-size:.95rem;
-  margin-bottom:6px;
-}
-#readingCenter .bigword{
-  font-size:clamp(4rem,7vw,6.5rem);
-  line-height:1.45;
-  padding:16px 8px 20px;
 }
 #readingCenter .sheet{
   width:100%;
-  min-height:420px;
-  padding:42px 42px 48px;
-  border:2px solid #d8e8f0;
-  background:linear-gradient(180deg,#fffdf8 0%,#fff9ef 100%);
-  box-shadow:0 16px 34px rgba(40,75,95,.10);
-}
-#readingCenter #text{
-  max-width:820px;
-  margin:0 auto;
-  font-size:clamp(2rem,3vw,2.55rem);
-  line-height:2.05;
-  text-align:center;
 }
 #readingCenter .mistakes{
   width:100%;
@@ -664,10 +596,6 @@ body[data-sana-device="phone"] .reading-sidebar.open .reading-sidebar-content{
 body[data-sana-device="tablet"][data-sana-layout="portrait"] #readingRightSidebar .v10-grid{
   grid-template-columns:repeat(2,minmax(0,1fr));
 }
-body[data-sana-device="tablet"][data-sana-layout="portrait"] #readingLeftSidebar .left-reading-actions .mode-strip,
-body[data-sana-device="tablet"][data-sana-layout="portrait"] #readingLeftSidebar .left-reading-actions .pause-bar{
-  grid-template-columns:1fr 1fr;
-}
 body[data-sana-device="phone"] #readingRightSidebar .v10-grid{
   grid-template-columns:repeat(2,minmax(0,1fr));
 }
@@ -694,13 +622,11 @@ body[data-sana-device="phone"] #readingCenter #text{
 
 @media(max-width:560px){
   #readingResponsiveLayout{gap:8px}
-  #readingCenter .card{min-height:260px;padding:20px 14px}
-  #readingCenter .sheet{min-height:330px;padding:28px 16px 34px}
-  #readingCenter #text{font-size:clamp(1.65rem,5.6vw,2.1rem);line-height:2}
-  #readingLeftSidebar .left-reading-actions .mode-strip,
-  #readingLeftSidebar .left-reading-actions .pause-bar{grid-template-columns:1fr 1fr}
+  #readingCenter .card{min-height:230px;padding:14px}
   #readingCenter .ghostw{font-size:1rem}
   #readingCenter .bigword{font-size:clamp(2.8rem,19vw,4.5rem)}
+  #readingCenter .mode-strip,
+  #readingCenter .pause-bar{gap:5px}
   #readingCenter .controls .row{gap:6px}
   #readingCenter .controls button{font-size:.9rem;padding:10px 6px}
   #readingRightSidebar .v10-grid{grid-template-columns:1fr 1fr}
@@ -2519,18 +2445,6 @@ renderTextMeta();
       const savedCount=morePanel.querySelector('#savedCount');
       // savedCount lives inside text-manager; keep this guard for future markup changes.
 
-      // Left rail: compact reading mode / playback controls under "نصوصي".
-      const modeStrip=wrap.querySelector('.mode-strip');
-      const pauseBar=wrap.querySelector('.pause-bar');
-      if(modeStrip || pauseBar){
-        const actions=document.createElement('div');
-        actions.className='left-reading-actions';
-        actions.innerHTML='<div class="actions-title">🎛 التحكم بالقراءة</div>';
-        if(modeStrip) actions.appendChild(modeStrip);
-        if(pauseBar) actions.appendChild(pauseBar);
-        leftContent.appendChild(actions);
-      }
-
       // Right rail: progress, sharing and reading tools.
       const topActions=morePanel.querySelector('.top-actions');
       if(topActions) rightContent.appendChild(topActions);
@@ -2557,10 +2471,12 @@ renderTextMeta();
     }
 
     // Move the actual reading content into the center column.
-    const centerIds=['cardView','fullView','fill','heard','azureSecureStatus','mistakesBox','v8ReadControlsWrap'];
+    const centerIds=['cardView','fullView','fill','mode-strip','pause-bar','heard','azureSecureStatus','mistakesBox','v8ReadControlsWrap'];
     const centerNodes=[];
     for(const id of centerIds){
       const el=id==='fill' ? document.getElementById('fill')?.closest('.bar') :
+               id==='mode-strip' ? wrap.querySelector('.mode-strip') :
+               id==='pause-bar' ? wrap.querySelector('.pause-bar') :
                document.getElementById(id);
       if(el && !centerNodes.includes(el)) centerNodes.push(el);
     }
@@ -2575,7 +2491,7 @@ renderTextMeta();
     // Any remaining direct children are moved into center, except the side/menu pieces.
     Array.from(wrap.children).forEach(el=>{
       if(el===header || el===banner || el===moreRow || el===morePanel) return;
-      if(el.classList.contains('mistakes') || el.id==='v8ReadControlsWrap' || el.id==='cardView' || el.id==='fullView' || el.classList.contains('bar') || el.id==='heard' || el.id==='azureSecureStatus') return;
+      if(el.classList.contains('mistakes') || el.id==='v8ReadControlsWrap' || el.id==='cardView' || el.id==='fullView' || el.classList.contains('bar') || el.classList.contains('mode-strip') || el.classList.contains('pause-bar') || el.id==='heard' || el.id==='azureSecureStatus') return;
       // Keep anything else in center so existing dialogs/scripts are not affected.
       if(el.parentElement===wrap) center.appendChild(el);
     });
