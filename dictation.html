@@ -210,7 +210,286 @@ window.loadAzureSdk=function(){
   });
   return window.__azureSdkPromise;
 };
-</script></head>
+</script>
+<style id="sana-basic-design-preview">
+/* ===== Experimental BASIC PAGE design — functionality unchanged ===== */
+body{
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255,247,226,.95) 0, transparent 42%),
+    radial-gradient(circle at 88% 82%, rgba(207,224,232,.55) 0, transparent 45%),
+    #f3ecdc;
+  padding-top:18px;
+}
+.wrap{max-width:900px}
+header{
+  margin:0 auto 14px;
+  max-width:820px;
+  padding:4px 2px;
+}
+h1{
+  font-size:1.45rem;
+  letter-spacing:.1px;
+}
+.stats{gap:8px}
+.pill{
+  padding:6px 13px;
+  font-size:.9rem;
+  background:rgba(255,255,255,.92);
+}
+a.back{font-size:.9rem;margin-bottom:10px}
+.modes{
+  max-width:820px;
+  margin:0 auto 12px;
+  padding:5px;
+  background:rgba(255,255,255,.58);
+  border:1px solid #e6dcc6;
+  border-radius:16px;
+}
+.modes button{
+  padding:10px 8px;
+  font-size:.92rem;
+  border-radius:12px;
+}
+.card{
+  max-width:820px!important;
+  padding:26px 28px 24px;
+  border-radius:28px;
+  border:1px solid rgba(230,220,198,.95);
+  box-shadow:0 20px 45px -22px rgba(47,52,55,.42);
+}
+.counter{
+  font-size:.95rem;
+  color:#7d858b;
+}
+.slots{
+  font-size:2.55rem;
+  letter-spacing:.28em;
+  padding:14px 0 8px;
+  color:#c2b69b;
+}
+input#ans{
+  min-height:70px;
+  font-size:2.25rem;
+  border-radius:18px;
+  border:2px solid #d8ccb2;
+  box-shadow:inset 0 2px 8px rgba(47,52,55,.04);
+}
+input#ans:focus{
+  border-color:#e0a11b;
+  box-shadow:0 0 0 4px rgba(224,161,27,.12);
+}
+.msg{
+  font-size:1rem;
+  padding:5px 8px 0;
+}
+.bar{
+  height:10px;
+  margin:18px 0 0;
+}
+.controls{
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+  background:linear-gradient(to top,#eee5d1 78%,rgba(238,229,209,0));
+}
+.controls .row{
+  max-width:820px;
+}
+.controls button{
+  min-height:48px;
+  font-size:1rem;
+}
+.controls .row:nth-child(2) button,
+.controls .row:nth-child(3) button{
+  font-size:.9rem;
+}
+button.main{
+  background:#2f8f5b;
+}
+button.hear{
+  background:#5aa9d6;
+}
+@media(max-width:600px){
+  body{padding-top:12px}
+  .wrap{max-width:100%}
+  header{padding-inline:2px}
+  h1{font-size:1.2rem}
+  .card{padding:20px 15px 18px;border-radius:23px}
+  .slots{font-size:2.1rem}
+  input#ans{min-height:62px;font-size:2rem}
+}
+</style>
+
+
+<style id="dictation-v2-preview">
+/* V2 preview: clearer learning hierarchy, without changing the page functions */
+.modes{
+  position:relative;
+  padding:8px;
+  margin-bottom:18px;
+  background:rgba(255,255,255,.72);
+  box-shadow:0 6px 18px -14px rgba(47,52,55,.45);
+}
+.modes::before{
+  content:"طريقة الكتابة";
+  display:block;
+  text-align:right;
+  font-size:.78rem;
+  font-weight:800;
+  color:#858b90;
+  padding:0 4px 5px;
+}
+.modes button{
+  border:1px solid #ddd1b8;
+  box-shadow:none;
+  min-height:42px;
+  transition:background .15s, color .15s, transform .1s;
+}
+.modes button.act{
+  box-shadow:0 2px 0 #1e2427;
+}
+
+.card{
+  background:rgba(255,252,244,.96);
+  padding:30px 30px 26px;
+}
+.counter{
+  display:inline-block;
+  background:#f2ead8;
+  border-radius:999px;
+  padding:4px 12px;
+  margin-bottom:6px;
+}
+.slots{
+  min-height:2em;
+  font-size:2.65rem;
+  line-height:1.35;
+  color:#b7aa8e;
+}
+input#ans{
+  background:#fff;
+  min-height:74px;
+  padding:12px 18px;
+}
+input#ans::placeholder{
+  color:#b4b0a6;
+  opacity:1;
+}
+.fb{
+  min-height:1.8em;
+  margin-top:3px;
+}
+.msg{
+  display:inline-block;
+  max-width:100%;
+  background:#f5efe2;
+  border-radius:12px;
+  padding:6px 12px;
+  margin-top:7px;
+}
+.bar{
+  margin-top:20px;
+  height:11px;
+}
+
+.controls{
+  padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+  background:linear-gradient(to top,#ece2cc 78%,rgba(236,226,204,0));
+  box-shadow:0 -10px 25px -22px rgba(47,52,55,.7);
+}
+.controls .row{
+  max-width:820px;
+}
+.controls .row:first-child button{
+  min-height:54px;
+  font-size:1.05rem;
+}
+.controls .row:nth-child(2) button{
+  background:rgba(255,255,255,.9);
+  border-color:#cfc3aa;
+  box-shadow:0 3px 0 #cfc3aa;
+}
+.controls .row:nth-child(3){
+  opacity:.88;
+}
+.controls .row:nth-child(3) button{
+  min-height:38px;
+}
+
+@media(max-width:600px){
+  .modes{
+    margin-bottom:12px;
+    padding:7px;
+  }
+  .modes::before{
+    font-size:.72rem;
+  }
+  .modes button{
+    font-size:.84rem;
+    padding:8px 4px;
+  }
+  .card{
+    padding:22px 15px 20px;
+  }
+  .slots{
+    font-size:2.2rem;
+  }
+  .controls{
+    padding-inline:9px;
+  }
+  .controls .row:first-child button{
+    min-height:50px;
+    font-size:.96rem;
+  }
+}
+</style>
+
+
+<style id="dictation-v3-feedback-preview">
+/* V3 preview: clearer feedback states */
+#ans.ok{
+  border-color:var(--ok) !important;
+  box-shadow:0 0 0 4px rgba(47,143,91,.12), 0 4px 0 rgba(47,143,91,.16) !important;
+}
+#ans.bad{
+  border-color:var(--bad) !important;
+  box-shadow:0 0 0 4px rgba(226,114,91,.11), 0 4px 0 rgba(226,114,91,.14) !important;
+}
+.fb{
+  font-size:1.05rem;
+  font-weight:800;
+  transition:all .18s ease;
+}
+.fb.ok{
+  color:var(--ok);
+}
+.fb.bad{
+  color:var(--bad);
+}
+.msg{
+  font-size:.98rem;
+  font-weight:700;
+}
+.msg.ok{
+  background:#e8f4ec;
+  color:#276f48;
+}
+.msg.bad{
+  background:#faeae5;
+  color:#9c4d3d;
+}
+.reveal-word{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-top:10px;
+  padding:7px 13px;
+  border-radius:12px;
+  background:#f1eadb;
+  color:#4b4f51;
+  font-weight:800;
+}
+</style>
+
+</head>
 <body>
 <div class="wrap">
 <header>
