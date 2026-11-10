@@ -184,6 +184,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>"/>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.gstatic.com" rel="preconnect" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;700;800&amp;family=Noto+Naskh+Arabic:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
 <style>
   :root{
@@ -298,6 +299,7 @@
 
 </style>
 <script src="reading-app-config.js"></script>
+<script src="pwa-register.js" defer></script>
 
 <style id="app-css">
 /* ============================================================
@@ -730,8 +732,9 @@ body[data-sana-device="phone"] #readingCenter #text{
 <div class="top-actions">
 <button id="progressBtn">📊 تقدّمي</button>
 <button id="backupTextsBtn">⬇ نصوصي</button>
-<button id="shareBtn">📤 مشاركة</button>
+<button id="shareBtn">🔗 رابط النص الحالي</button>
 </div>
+<div class="saved-count" style="margin:4px 2px 0">النصوص المحفوظة تبقى على هذا الجهاز؛ استخدمي رابط النص الحالي لمشاركتها مع الآخرين.</div>
 <div class="text-meta" id="textMeta">—</div>
 <div class="row" style="margin-top:8px">
 <button class="ghost" id="recBtn">🎙 سجّل بصوتك</button>
@@ -965,7 +968,6 @@ body[data-sana-device="phone"] #readingCenter #text{
   });
   document.getElementById("v9BackupBtn")?.addEventListener("click", exportBackup);
   window.addEventListener("storage", e => { if(e.key===V10_KEY) render(); });
-  setInterval(render, 3000);
   render();
 })();
 </script>
@@ -977,7 +979,10 @@ body[data-sana-device="phone"] #readingCenter #text{
   const stateKey = "readingCoachV10";
   let state = JSON.parse(localStorage.getItem(stateKey) || '{"hard":{},"sessions":0,"words":0,"bestAccuracy":0,"bestStreak":0,"history":[]}');
 
-  function persist(){ localStorage.setItem(stateKey, JSON.stringify(state)); }
+  function persist(){
+    try{ localStorage.setItem(stateKey, JSON.stringify(state)); }catch(e){}
+    window.readingCoachV9?.render?.();
+  }
   // Azure يرجع النص المسموع بدون تشكيل وبدون علامات ترقيم، فنُنظّف النص المرجعي بنفس الشكل
   // حتى لا تُحسب كل الكلمات "ناقصة" وتصبح الدرجة 0.
   function cleanRef(s){
@@ -1013,21 +1018,23 @@ body[data-sana-device="phone"] #readingCenter #text{
     return 1 - lev(a,b)/L;
   }
   // مواءمة كلمات النص المرجعي مع الكلمات المسموعة (LCS موزون). تُرجع: لكل كلمة مرجعية فهرس المسموعة أو -1
+  // Match words in order with a bounded look-ahead to keep long passages responsive.
   function alignWords(refN, heardN, thr){
-    const R=refN.length,H=heardN.length, NEG=-1e9;
-    const dp=Array.from({length:R+1},()=>new Array(H+1).fill(0));
-    const S=Array.from({length:R},(_,i)=>heardN.map(h=>sim(refN[i],h)));
-    for(let i=1;i<=R;i++) for(let j=1;j<=H;j++){
-      const s=S[i-1][j-1];
-      const diag = s>=thr ? dp[i-1][j-1]+s : NEG;
-      dp[i][j]=Math.max(dp[i-1][j],dp[i][j-1],diag);
-    }
+    const R=refN.length,H=heardN.length;
     const map=new Array(R).fill(-1);
-    let i=R,j=H;
-    while(i>0&&j>0){
-      const s=S[i-1][j-1];
-      if(s>=thr && Math.abs(dp[i][j]-(dp[i-1][j-1]+s))<1e-9){ map[i-1]=j-1; i--; j--; }
-      else if(dp[i-1][j]>=dp[i][j-1]) i--; else j--;
+    const lookAhead=Math.min(48,Math.max(12,Math.ceil(R*0.08)));
+    let cursor=0;
+    for(let j=0;j<H && cursor<R;j++){
+      const heard=heardN[j];
+      if(!heard) continue;
+      let bestIndex=-1,bestScore=thr;
+      const end=Math.min(R,cursor+lookAhead);
+      for(let i=cursor;i<end;i++){
+        const score=sim(refN[i],heard);
+        if(score>bestScore){ bestScore=score; bestIndex=i; }
+        if(score===1){ bestIndex=i; break; }
+      }
+      if(bestIndex>=0){ map[bestIndex]=j; cursor=bestIndex+1; }
     }
     return map;
   }
@@ -1163,6 +1170,7 @@ body[data-sana-device="phone"] #readingCenter #text{
     const o = fullOverlay();
     let rec = null, stopping = false, closed = false;
     let heardWords = [], partial = [], recognizedPieces = [];
+    let liveTimer=0, lastLiveUpdate=0;
 
     const spansHtml = cls => items.map((x,i)=>`<span class="w ${cls?cls[i]||'':''}">${escapeHtml(x.show)}</span>`).join(' ');
     const frame = (title, status, body, buttons) => {
@@ -1175,6 +1183,7 @@ body[data-sana-device="phone"] #readingCenter #text{
     };
     const setStatus = html => { const el=o.querySelector('#foStatus'); if(el) el.innerHTML=html; };
     const closeOverlay = () => {
+      clearTimeout(liveTimer); liveTimer=0;
       closed = true; stopping = true;
       try{ rec && rec.close(); }catch(e){}
       o.style.display='none'; o.innerHTML='';
@@ -1208,9 +1217,15 @@ body[data-sana-device="phone"] #readingCenter #text{
         if(cur){ cur.classList.add('cur'); box.scrollTop = Math.max(0, cur.offsetTop - box.clientHeight/2); }
       }
     };
+    const scheduleLiveUpdate = () => {
+      if(closed || liveTimer) return;
+      const delay=Math.max(0,180-(Date.now()-lastLiveUpdate));
+      liveTimer=setTimeout(()=>{ liveTimer=0; lastLiveUpdate=Date.now(); updateLive(); },delay);
+    };
 
     const finishError = err => {
       if(closed) return;
+      clearTimeout(liveTimer); liveTimer=0;
       try{ rec && rec.close(); }catch(e){}
       console.error('Full-text pronunciation stop error:', err);
       showError(String(err?.message || err || 'تعذر إيقاف التقييم.'));
@@ -1218,6 +1233,7 @@ body[data-sana-device="phone"] #readingCenter #text{
 
     const finishResult = () => {
       if(closed) return;
+      clearTimeout(liveTimer); liveTimer=0;
       try{ rec && rec.close(); }catch(e){}
       if(!heardWords.length){
         frame("لم أسمع قراءة", '', `<p class="fo-small">لم يصل أي صوت مفهوم. قرّبي الجهاز وتأكدي أن المايك مسموح، ثم اقرئي النص مرة أخرى قبل الضغط على «خلصت».</p>`,
@@ -1304,7 +1320,7 @@ body[data-sana-device="phone"] #readingCenter #text{
       rec.recognizing = (s,e) => {
         try{
           partial = String(e.result?.text||'').split(/\s+/).filter(Boolean);
-          updateLive();
+          scheduleLiveUpdate();
         }catch(err){}
       };
 
@@ -1320,6 +1336,7 @@ body[data-sana-device="phone"] #readingCenter #text{
             heardWords.push({word:w.Word, score: wp && wp.AccuracyScore!=null ? Number(wp.AccuracyScore) : null});
           });
           partial = [];
+          clearTimeout(liveTimer); liveTimer=0; lastLiveUpdate=Date.now();
           updateLive();
         }catch(err){ console.error('recognized handler error:',err); }
       };
@@ -1458,6 +1475,9 @@ const TextManager = {
     try{ this.list = JSON.parse(localStorage.getItem(this.STORAGE_KEY)||'[]'); if(!Array.isArray(this.list)) this.list=[]; }
     catch(e){ this.list=[]; }
     if(!this.list.length){ this.list=[{id:uid(), name:'النص الافتراضي', text: DEFAULT_TEXT}]; }
+    let migratedDefault=false;
+    const builtin=this.list.find(x=>x && x.name==='النص الافتراضي');
+    if(builtin && builtin.text!==DEFAULT_TEXT){ builtin.text=DEFAULT_TEXT; migratedDefault=true; }
     const params = new URLSearchParams(window.location.search);
     const sharedText = (params.get('shareText') || '').trim();
     if(sharedText){
@@ -1470,6 +1490,7 @@ const TextManager = {
     }
     let selected=''; try{ selected = localStorage.getItem(this.SELECTED_KEY)||''; }catch(e){}
     this.current = this.list.find(x=>x.id===selected) || this.list[0];
+    if(migratedDefault) this.save();
     try{
       window.sanaTextSync?.publish(this.current.text, {name:this.current.name, textId:this.current.id});
     }catch(e){}
@@ -2442,7 +2463,37 @@ document.querySelectorAll('[data-mode]').forEach(btn=>btn.addEventListener('clic
   }
   paint();
 }));
-$('diagBtn').onclick=()=>{ $('diag').innerHTML='جارٍ الفحص…'; $('diagDlg').showModal(); runDiag(); };
+async function runDiag(){
+  const box=$('diag');
+  if(!box) return;
+  const rows=[];
+  const add=(label,ok,detail)=>rows.push({label,ok,detail});
+  add('الاتصال بالإنترنت',navigator.onLine,'حالة المتصفح الحالية');
+  add('اتصال آمن',!!window.isSecureContext,'الموقع الآمن مطلوب للمايك');
+  add('إمكانية استخدام المايك',!!(navigator.mediaDevices?.getUserMedia),'دعم المتصفح');
+  add('تسجيل الصوت',!!window.MediaRecorder,'دعم المتصفح');
+  add('التعرف على الكلام',!!SR || !!window.SpeechSDK || !!window.loadAzureSdk,'تتوفر خدمة أو واجهة التعرف');
+  add('خدمة تقييم النطق',azureConfigured(),'إعداد رابط خدمة الصوت');
+  add('حفظ التسجيلات',!!window.indexedDB,'قاعدة بيانات هذا الجهاز');
+  let mic='سيُطلب عند بدء التسجيل';
+  try{
+    const permission=await navigator.permissions?.query({name:'microphone'});
+    if(permission) mic=permission.state==='granted'?'مسموح':permission.state==='denied'?'مرفوض':'سيُطلب عند بدء التسجيل';
+  }catch(e){}
+  add('إذن المايك',mic==='مسموح' || mic==='سيُطلب عند بدء التسجيل',mic);
+  box.replaceChildren(...rows.map(item=>{
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;gap:8px;align-items:flex-start;padding:7px 9px;margin:5px 0;border-radius:10px;background:'+(item.ok?'#effaf2':'#fff4e8')+';color:#28343b';
+    const mark=document.createElement('strong');
+    mark.textContent=item.ok?'✓':'!';
+    mark.style.color=item.ok?'#247a43':'#ad5a1b';
+    const text=document.createElement('span');
+    text.textContent=item.label+': '+(typeof item.ok==='boolean'?(item.ok?'متاح':'غير متاح'):item.ok)+' — '+item.detail;
+    row.append(mark,text);
+    return row;
+  }));
+}
+$('diagBtn').onclick=()=>{ $('diag').textContent='جارٍ الفحص…'; $('diagDlg').showModal(); runDiag(); };
 let fmr=null, fmrChunks=[], fmrStream=null;
 async function refreshFull(){
   const b = await recGet(FULL_KEY);

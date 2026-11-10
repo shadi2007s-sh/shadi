@@ -1,10 +1,9 @@
 // Bump CACHE version on every deploy
-const CACHE = 'sana-app-shell-v19';
+const CACHE = 'sana-app-shell-v20';
 const APP_SHELL = [
   './index.html',
   './reading.html',
   './reading.css',
-  './reading.js',
   './dictation.html',
   './diagnostics.html',
   './reading-app-config.js',
@@ -13,8 +12,6 @@ const APP_SHELL = [
   './sana-text.js',
   './manifest.webmanifest',
   './pwa-register.js',
-  './icons/icon-192.png',
-  './icons/icon-512.png'
 ];
 
 self.addEventListener('install', event => {
