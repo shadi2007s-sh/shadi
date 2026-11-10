@@ -1,0 +1,5 @@
+Repository: https://github.com/shadi2007s-sh/shadi1
+Branch: main
+Commit: 9f3d135aa684f030cbc4acd697e841bb04475896
+Snapshot date: 2026-11-10
+Contents: all tracked files at this commit; Git history is not included.
