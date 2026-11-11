@@ -182,10 +182,8 @@
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport"/>
 <title>مدرّب القراءة العربية — Sana Neural</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>"/>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.gstatic.com" rel="preconnect" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;700;800&amp;family=Noto+Naskh+Arabic:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link rel="manifest" href="manifest.webmanifest"/>
+<meta name="theme-color" content="#4f9fcb"/>
 <style>
   :root{
     --paper:#fbf6e9;--ink:#2f3437;--rule:#cfe0e8;--margin:#e2725b;
@@ -676,6 +674,32 @@ body[data-sana-device="phone"] #readingCenter #text{
 #v10FullOverlay .fo-legend{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;font-size:.85rem}
 #v10FullOverlay .fo-legend .w{font-size:.85rem;font-family:inherit}
 </style>
+<style id="sana-extra">
+@font-face{font-family:"Noto Naskh Arabic";font-weight:400;font-display:swap;src:url(fonts/noto-naskh-arabic-arabic-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Noto Naskh Arabic";font-weight:600;font-display:swap;src:url(fonts/noto-naskh-arabic-arabic-600-normal.woff2) format("woff2")}
+@font-face{font-family:"Noto Naskh Arabic";font-weight:700;font-display:swap;src:url(fonts/noto-naskh-arabic-arabic-700-normal.woff2) format("woff2")}
+@font-face{font-family:"Baloo Bhaijaan 2";font-weight:500;font-display:swap;src:url(fonts/baloo-bhaijaan-2-arabic-500-normal.woff2) format("woff2")}
+@font-face{font-family:"Baloo Bhaijaan 2";font-weight:700;font-display:swap;src:url(fonts/baloo-bhaijaan-2-arabic-700-normal.woff2) format("woff2")}
+@font-face{font-family:"Baloo Bhaijaan 2";font-weight:800;font-display:swap;src:url(fonts/baloo-bhaijaan-2-arabic-800-normal.woff2) format("woff2")}
+/* أهداف لمس لا تقل عن 48px */
+button,.v10-btn,.ghost,select,.mode-strip button,.pause-bar button,.mic{min-height:48px}
+button{touch-action:manipulation}
+/* مايك نابض أثناء التسجيل */
+.mic.on{animation:sanaMicPulse 1.1s ease-in-out infinite}
+@keyframes sanaMicPulse{0%,100%{box-shadow:0 0 0 0 rgba(224,82,77,.55)}50%{box-shadow:0 0 0 16px rgba(224,82,77,0)}}
+/* حجم الخط */
+body.sz-l .bigword{font-size:clamp(3.6rem,19vw,7rem)} body.sz-l #text{font-size:2.3rem} body.sz-l .ghostw{font-size:1.5rem}
+body.sz-xl .bigword{font-size:clamp(4.2rem,22vw,8.5rem)} body.sz-xl #text{font-size:2.8rem} body.sz-xl .ghostw{font-size:1.8rem}
+/* تباين عالٍ */
+body.hc{background:#fff!important;color:#000!important}
+body.hc .bigword,body.hc #text{color:#000!important}
+body.hc .ghostw{color:#444!important}
+body.hc .w.done{color:#0a5a2a!important} body.hc .w.now{background:#ffe066!important;color:#000!important}
+body.hc button,body.hc select{border:3px solid #000!important;color:#000!important}
+body.hc .card,body.hc .sheet,body.hc .pill{border:3px solid #000!important}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.confetti{display:none}}
+.sana-set-note{font-size:.78rem;color:#6b7075;background:#eef6fa;border:1px solid #cfe4ee;border-radius:10px;padding:8px;margin-top:8px;line-height:1.6}
+</style>
 </head>
 <body>
 <div style="max-width:860px;margin:0 auto 10px;text-align:center">
@@ -715,6 +739,7 @@ body[data-sana-device="phone"] #readingCenter #text{
 <div class="stats">
 <div class="pill">⭐ <span id="score">0</span></div>
 <div class="pill">📊 <span id="prog">0</span>%</div>
+<div class="pill" title="هدف اليوم">🎯 <span id="dayGoal">0</span>/<span id="dayGoalMax">20</span></div>
 </div>
 </header>
 <div class="banner hide" id="banner"></div>
@@ -890,6 +915,19 @@ body[data-sana-device="phone"] #readingCenter #text{
 <option selected="" value="normal">🙂 طبيعية</option>
 <option value="long">🐢 طويلة</option>
 </select>
+<h4 style="margin:14px 0 4px">🎓 إعدادات التدريب</h4>
+<label for="prefJudge">صرامة الحكم على الكلمة</label>
+<select id="prefJudge"><option value="easy">😊 متساهل</option><option value="mid">🙂 متوسط</option><option value="strict">🎯 صارم</option></select>
+<label for="prefStt">لهجة التعرّف على الكلام</label>
+<select id="prefStt"><option value="auto">تلقائي (أردني للكلمات)</option><option value="ar-JO">🇯🇴 أردني</option><option value="ar-SA">🇸🇦 فصحى/سعودي</option></select>
+<label for="prefSeg">تقييم النص الكامل</label>
+<select id="prefSeg"><option value="0">النص كله دفعة واحدة</option><option value="15">مقاطع قصيرة (~15 كلمة)</option><option value="25">مقاطع متوسطة (~25 كلمة)</option></select>
+<label for="prefSize">حجم الخط</label>
+<select id="prefSize"><option value="m">عادي</option><option value="l">كبير</option><option value="xl">كبير جدًا</option></select>
+<label for="prefGoal">هدف اليوم (كلمات)</label>
+<select id="prefGoal"><option value="10">10</option><option value="20">20</option><option value="40">40</option><option value="80">80</option></select>
+<label style="display:flex;gap:8px;align-items:center;margin-top:8px"><input id="prefHc" type="checkbox"/> تباين عالٍ</label>
+<div class="sana-set-note">🔒 صوتك يُرسل إلى خدمة Azure للتعرّف على الكلام فقط. التسجيلات المحفوظة والتقدّم يبقيان على هذا الجهاز ولا تُشارَك.</div>
 
 <div class="chk"><input id="noTash" type="checkbox"/> <label for="noTash">انطق بدون تشكيل (جرّبيها إذا اللفظ غريب)</label></div>
 <div class="row" style="margin-top:12px">
@@ -977,7 +1015,14 @@ body[data-sana-device="phone"] #readingCenter #text{
   const cfg = window.READING_APP_CONFIG || {};
   const panel = document.getElementById("v10Panel");
   const stateKey = "readingCoachV10";
-  let state = JSON.parse(localStorage.getItem(stateKey) || '{"hard":{},"sessions":0,"words":0,"bestAccuracy":0,"bestStreak":0,"history":[]}');
+  const defaultState = () => ({hard:{},sessions:0,words:0,bestAccuracy:0,bestStreak:0,history:[]});
+  let state; try{ state = Object.assign(defaultState(), JSON.parse(localStorage.getItem(stateKey)||'{}')); if(typeof state!=='object'||!state) state=defaultState(); }catch(e){ state=defaultState(); }
+  try{ localStorage.setItem('readingApp.schema','2'); }catch(e){}
+  // لهجة التعرّف: تلقائي = أردني للكلمات الفردية، وSA للنص الكامل (الإعداد الذي ثبت أنه يعمل)
+  window.sttLang = function(kind){
+    let s='auto'; try{ s=localStorage.getItem('readingApp.sttLang')||'auto'; }catch(e){}
+    return s==='auto' ? (kind==='full' ? 'ar-SA' : 'ar-JO') : s;
+  };
 
   function persist(){
     try{ localStorage.setItem(stateKey, JSON.stringify(state)); }catch(e){}
@@ -1080,7 +1125,7 @@ body[data-sana-device="phone"] #readingCenter #text{
     const SDK = await loadSdk();
     const t = await token();
     const speechConfig = SDK.SpeechConfig.fromAuthorizationToken(t.token, t.region || cfg.REGION || "eastus");
-    speechConfig.speechRecognitionLanguage = "ar-SA";
+    speechConfig.speechRecognitionLanguage = sttLang("full");
     const audioConfig = SDK.AudioConfig.fromDefaultMicrophoneInput();
     const rec = new SDK.SpeechRecognizer(speechConfig, audioConfig);
     const pac = new SDK.PronunciationAssessmentConfig(
@@ -1159,8 +1204,25 @@ body[data-sana-device="phone"] #readingCenter #text{
     return o;
   }
 
-  async function runFullTextPron(){
-    const items = words.map(w=>({show:w, n:normAr(w), plain:w.replace(PUNCT_RE,'')}));
+  // تقسيم النص إلى مقاطع قصيرة تنتهي عند علامة ترقيم (اختياري من الإعدادات)
+  function makeSegments(arr, N){
+    if(!N || arr.length <= N*1.3) return [[0,arr.length]];
+    const segs=[]; let start=0;
+    for(let i=0;i<arr.length;i++){
+      const n=i-start+1, endsSentence=/[.؟!؛،]$/.test(arr[i]);
+      if(i===arr.length-1 || (n>=N && endsSentence) || n>=Math.round(N*1.6)){ segs.push([start,i+1]); start=i+1; }
+    }
+    return segs;
+  }
+
+  async function runFullTextPron(seg=0){
+    seg = Number.isInteger(seg) ? seg : 0;
+    let segN=0; try{ segN=Number(localStorage.getItem('readingApp.segment'))||0; }catch(e){}
+    const segs = makeSegments(words, segN);
+    if(seg<0 || seg>=segs.length) seg=0;
+    const hasNext = seg < segs.length-1;
+    const segLabel = segs.length>1 ? ` — المقطع ${seg+1} من ${segs.length}` : '';
+    const items = words.slice(segs[seg][0], segs[seg][1]).map(w=>({show:w, n:normAr(w), plain:w.replace(PUNCT_RE,'')}));
     const alignIdx = items.map((x,i)=>x.n?i:-1).filter(i=>i>=0);
     if(!alignIdx.length){ showPanel("تقييم القراءة","لا يوجد نص حالي."); return; }
 
@@ -1189,7 +1251,8 @@ body[data-sana-device="phone"] #readingCenter #text{
       o.style.display='none'; o.innerHTML='';
     };
     const bindClose = () => o.querySelectorAll('[data-fo="close"]').forEach(b=>b.onclick=closeOverlay);
-    const bindRetry = () => o.querySelectorAll('[data-fo="retry"]').forEach(b=>b.onclick=()=>{ closeOverlay(); runFullTextPron(); });
+    const bindRetry = () => o.querySelectorAll('[data-fo="retry"]').forEach(b=>b.onclick=()=>{ closeOverlay(); runFullTextPron(seg); });
+    const bindNext = () => o.querySelectorAll('[data-fo="next"]').forEach(b=>b.onclick=()=>{ closeOverlay(); runFullTextPron(seg+1); });
     const showError = msg => {
       frame("تعذر التقييم", '', `<p class="fo-small">${escapeHtml(msg)}</p><p class="fo-small">تأكدي من السماح بالمايك وبقاء اتصال الإنترنت.</p>`,
         `<button class="fo-btn primary" data-fo="retry">🔁 حاولي مرة أخرى</button><button class="fo-btn" data-fo="close">إغلاق</button>`);
@@ -1197,7 +1260,7 @@ body[data-sana-device="phone"] #readingCenter #text{
     };
 
     // الشاشة الأولى: النص كبير وزر الإيقاف واضح
-    frame("📖 اقرئي النص بصوتك", `⏳ جارٍ تجهيز المايك…`,
+    frame("📖 اقرئي النص بصوتك"+segLabel, `⏳ جارٍ تجهيز المايك…`,
       `<div class="fo-textbox" id="foText">${spansHtml()}</div>`,
       `<button class="fo-btn stop" id="foStop" disabled>⏳ تجهيز…</button><button class="fo-btn" data-fo="close">✕ إلغاء</button>`);
     bindClose();
@@ -1260,15 +1323,15 @@ body[data-sana-device="phone"] #readingCenter #text{
       const avg = Math.round(sum/total);
       const verdict = avg>=85 ? 'ممتاز 🌟' : avg>=70 ? 'جيد 👍' : 'حاولي مرة أخرى 💪';
       const chip = (txt,extra='') => `<span class="v10-chip">${escapeHtml(txt)}${extra}</span>`;
-      frame("نتيجة قراءتك", '',
+      frame("نتيجة قراءتك"+segLabel, '',
         `<div class="fo-score"><b>${avg}%</b><strong style="font-size:1.4rem">${verdict}</strong></div>
          <div class="fo-meter"><i style="width:${Math.max(0,Math.min(100,avg))}%"></i></div>
          <div class="fo-small">قُرئت ${read} من ${total} كلمة</div>
          <div class="fo-textbox" id="foText">${spansHtml(cls)}</div>
          <div class="fo-legend"><span class="w good">ممتازة</span><span class="w ok">جيدة</span><span class="w bad">تحتاج تدريب</span><span class="w miss">لم أسمعها</span></div>
          ${hasPA ? '' : '<div class="fo-small">تنبيه: الخدمة لم تُرجع درجات نطق لكل كلمة، فالنتيجة مبنية على تطابق الكلمات المسموعة مع النص فقط.</div>'}`,
-        `<button class="fo-btn primary" data-fo="retry">🔁 اقرئي مرة أخرى</button><button class="fo-btn" data-fo="close">إغلاق</button>`);
-      bindClose(); bindRetry();
+        `${hasNext?'<button class="fo-btn stop" style="background:#2f8f5b;border-color:#1f6e43;box-shadow:0 5px 0 #1f6e43" data-fo="next">➡ المقطع التالي</button>':''}<button class="fo-btn primary" data-fo="retry">🔁 اقرئي مرة أخرى</button><button class="fo-btn" data-fo="close">إغلاق</button>`);
+      bindClose(); bindRetry(); bindNext();
       state.sessions += 1;
       state.words += read;
       state.bestAccuracy = Math.max(state.bestAccuracy, avg);
@@ -1302,7 +1365,7 @@ body[data-sana-device="phone"] #readingCenter #text{
       const speechConfig = SDK.SpeechConfig.fromAuthorizationToken(
         tk.token, tk.region || cfg.REGION || "eastus"
       );
-      speechConfig.speechRecognitionLanguage = "ar-SA";
+      speechConfig.speechRecognitionLanguage = sttLang("full");
 
       const audioConfig = SDK.AudioConfig.fromDefaultMicrophoneInput();
       rec = new SDK.SpeechRecognizer(speechConfig, audioConfig);
@@ -1610,7 +1673,22 @@ function useManagedText(){
   renderTextSelector(); build(text); resetLessonStats(); say('📖 تم استخدام النص: '+TextManager.current.name); $('dlg').close();
 }
 function recordWrong(target){appState.wrong++;appState.attempts++;appState.streak=0;appState.wordCount=(appState.wordCount||0)+1; const k=norm(target); appState.mistakes[k]=(appState.mistakes[k]||0)+1;saveState();renderDashboard();}
-function recordCorrect(target){appState.correct++;appState.attempts++;appState.streak++;appState.wordCount=(appState.wordCount||0)+1;appState.best=Math.max(appState.best,appState.streak);saveState();renderDashboard();}
+function dayKey(d=new Date()){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function daily(){ try{ const d=JSON.parse(localStorage.getItem('readingApp.daily')||'{}'); return {days:Array.isArray(d.days)?d.days:[],count:d.date===dayKey()?(d.count||0):0,date:dayKey()}; }catch(e){ return {days:[],count:0,date:dayKey()}; } }
+function dailyGoal(){ try{ return Number(localStorage.getItem('readingApp.goal'))||20; }catch(e){ return 20; } }
+function renderGoal(){ const el=$('dayGoal'); if(el){ el.textContent=Math.min(daily().count,9999); $('dayGoalMax').textContent=dailyGoal(); } }
+function bumpDaily(){
+  const d=daily(); d.count++; if(!d.days.includes(d.date)) d.days.push(d.date);
+  try{ localStorage.setItem('readingApp.daily',JSON.stringify({date:d.date,count:d.count,days:d.days.slice(-60)})); }catch(e){}
+  renderGoal();
+  if(d.count===dailyGoal()){ try{ beep(1047,.2); }catch(e){} say('🎯 حققتِ هدف اليوم! أحسنتِ ⭐'); }
+}
+function streakDays(){
+  const d=daily().days; let n=0; const cur=new Date();
+  while(d.includes(dayKey(cur))){ n++; cur.setDate(cur.getDate()-1); }
+  return n;
+}
+function recordCorrect(target){bumpDaily();appState.correct++;appState.attempts++;appState.streak++;appState.wordCount=(appState.wordCount||0)+1;appState.best=Math.max(appState.best,appState.streak);saveState();renderDashboard();}
 function renderMistakes(){const box=$('mistakesBox'),list=$('mistakeList'); if(!box||!list)return; const entries=Object.entries(appState.mistakes||{}).sort((a,b)=>b[1]-a[1]).slice(0,12); box.classList.toggle('show',entries.length>0); list.innerHTML=''; entries.forEach(([k,n])=>{const b=document.createElement('button');b.className='mistake-chip';b.textContent=k+' ×'+n;b.onclick=()=>{const i=words.findIndex(w=>norm(w)===k);if(i>=0){idx=i;paint();say('🎯 تدرّبي على: '+words[i]);}};list.appendChild(b);});}
 function accuracy(){ const total=(appState.correct||0)+(appState.wrong||0); return total?Math.round((appState.correct||0)/total*100):0; }
 function elapsedMs(){ return appState.startedAt ? Math.max(0,Date.now()-appState.startedAt) : 0; }
@@ -1635,21 +1713,25 @@ function sim(a,b){
     d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
   return 1-d[m][n]/Math.max(m,n);
 }
+const judgeLv = () => { try{ return localStorage.getItem('readingApp.judge')||'mid'; }catch(e){ return 'mid'; } };
 function accept(said,target){
   const t=norm(target), s=norm(said);
   if(!t) return true; if(!s) return false; if(s===t) return true;
-  if(t.length>3 && (s.includes(t)||t.includes(s))) return true;
-  const th = t.length<=3 ? .95 : (t.length<=5 ? .75 : .68);
+  const lv=judgeLv();
+  const near = Math.abs(s.length-t.length) <= (lv==='easy' ? 99 : 2);
+  if(t.length>3 && near && (s.includes(t)||t.includes(s))) return true;
+  const TH={easy:[.95,.75,.68],mid:[.95,.80,.75],strict:[.95,.85,.82]}[lv] || [.95,.80,.75];
+  const th = t.length<=3 ? TH[0] : (t.length<=5 ? TH[1] : TH[2]);
   return sim(s,t) >= th;
 }
-
+const wordTries = {};
 
 function handleT(said){
   const heard=String(said||'').trim();
   const target=words[idx]||'';
   if(!target) return;
   $('heard').innerHTML=heard?`سمعت: <b>${window.escapeHtml(heard)}</b>`:'استمع…';
-  if(accept(heard,target) || norm(heard).includes(norm(target))){
+  if(accept(heard,target)){
     score++;
     recordCorrect(target);
     $('bigword').classList.add('ok','pop');
@@ -1659,6 +1741,16 @@ function handleT(said){
     stopMic();
     if(idx>=words.length){paint();finish();}
     else {paint();say('✅ ممتاز! الكلمة التالية: '+words[idx]);}
+  } else if(heard){
+    wrong();
+    wordTries[idx]=(wordTries[idx]||0)+1;
+    if(wordTries[idx]>=2){
+      wordTries[idx]=0; stopMic();
+      $('heard').innerHTML='سمعت: <b>'+window.escapeHtml(heard)+'</b> — استمعي للكلمة ثم أعيديها 🔊';
+      setTimeout(()=>azureSpeak(target,null,{source:'repeat-word',playWhenActive:false}),350);
+    } else {
+      $('heard').innerHTML='سمعت: <b>'+window.escapeHtml(heard)+'</b> — قريبة! جرّبي مرة ثانية 💪';
+    }
   }
 }
 function build(txt){
@@ -1670,6 +1762,7 @@ function build(txt){
     el.className='w'; el.textContent=w; el.onclick=()=>{idx=i;paint();};
     box.appendChild(el); box.appendChild(document.createTextNode(' '));
   });
+  for(const k in wordTries) delete wordTries[k];
   idx=0; score=0; pausedReading=false; activeReadIndex=0; readSessionStartedAt=Date.now(); paint(); refreshRecSet();
   renderDashboard();
   // جهّز صوت النص الكامل في الخلفية واحفظه على الجهاز. لا يبدأ التشغيل أو التأشير هنا.
@@ -1681,6 +1774,7 @@ function paint(){
     el.classList.toggle('now',i===idx && !reading);
   });
   $('bigword').textContent = words[idx] || '🎉';
+  setTimeout(()=>{ try{ prefetchWord(words[idx]); prefetchWord(words[idx+1]); }catch(e){} },400);
   $('bigword').className = 'bigword';
   $('prevw').textContent = idx>0 ? words[idx-1] : '';
   $('nextw').textContent = idx<words.length-1 ? words[idx+1] : '';
@@ -1710,7 +1804,8 @@ function checkVoice(){
 }let engine='azure';
 const azureAudio = new Audio(); azureAudio.preload='auto';
 const AZURE_TOKEN_ENDPOINT = (window.READING_APP_CONFIG||{}).TOKEN_ENDPOINT || 'https://reading-speech-api-e9hbc8fscfaxacgv.israelcentral-01.azurewebsites.net/api/speech-token';
-const AZURE_SDK_URL = (window.READING_APP_CONFIG||{}).SDK_URL || 'https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@1.46.0/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js';
+const AZURE_SDK_URL = (window.READING_APP_CONFIG||{}).SDK_URL || './vendor/microsoft.cognitiveservices.speech.sdk.bundle-min.js';
+const AZURE_SDK_FALLBACK = (window.READING_APP_CONFIG||{}).SDK_FALLBACK_URL || 'https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@1.46.0/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js';
 let azureVoice='ar-JO-SanaNeural';
 let azureRegion=(window.READING_APP_CONFIG||{}).REGION || 'eastus';
 let azureSpeechToken='';
@@ -1757,17 +1852,20 @@ function azureUserError(e){
   };
   return map[m] || m || 'تعذر تشغيل Azure.';
 }
+function loadScriptOnce(src){
+  return new Promise((resolve,reject)=>{
+    const s=document.createElement('script');
+    s.src=src; s.async=true; s.crossOrigin='anonymous';
+    const to=setTimeout(()=>{ s.remove(); reject(new Error('SDK_LOAD_TIMEOUT')); },15000);
+    s.onload=()=>{clearTimeout(to); window.SpeechSDK?resolve(window.SpeechSDK):reject(new Error('SDK_LOAD_EMPTY'));};
+    s.onerror=()=>{clearTimeout(to); s.remove(); reject(new Error('SDK_LOAD_FAILED'));};
+    document.head.appendChild(s);
+  });
+}
 async function loadAzureSdk(){
   if(window.SpeechSDK) return window.SpeechSDK;
   if(azureSdkPromise) return azureSdkPromise;
-  azureSdkPromise=new Promise((resolve,reject)=>{
-    const s=document.createElement('script');
-    s.src=AZURE_SDK_URL; s.async=true; s.crossOrigin='anonymous';
-    const to=setTimeout(()=>reject(new Error('SDK_LOAD_TIMEOUT')),15000);
-    s.onload=()=>{clearTimeout(to); window.SpeechSDK?resolve(window.SpeechSDK):reject(new Error('SDK_LOAD_EMPTY'));};
-    s.onerror=()=>{clearTimeout(to);reject(new Error('SDK_LOAD_FAILED'));};
-    document.head.appendChild(s);
-  }).catch(e=>{azureSdkPromise=null;throw e;});
+  azureSdkPromise=loadScriptOnce(AZURE_SDK_URL).catch(()=>loadScriptOnce(AZURE_SDK_FALLBACK)).catch(e=>{azureSdkPromise=null;throw e;});
   return azureSdkPromise;
 }
 async function getAzureToken(force=false){
@@ -1809,6 +1907,25 @@ function unlockAzureAudio(){
 document.addEventListener('pointerdown',unlockAzureAudio,{once:false,passive:true});
 document.addEventListener('touchstart',unlockAzureAudio,{once:false,passive:true});
 let azureSpeakAbort=null;
+const TTS_CACHE='sana-tts-words-v1';
+function isWordTts(t){ return t.length<=30 && !/\s/.test(t); }
+function wordKey(text){ return new Request(location.origin+'/__tts__/'+encodeURIComponent([azureVoice,azureRate(rate),stripTash?1:0,text].join('|'))); }
+async function wordCacheGet(text){ try{ const c=await caches.open(TTS_CACHE); const r=await c.match(wordKey(text)); return r ? await r.blob() : null; }catch(e){ return null; } }
+async function wordCachePut(text,blob){ try{ const c=await caches.open(TTS_CACHE); await c.put(wordKey(text), new Response(blob,{headers:{'Content-Type':blob.type}})); }catch(e){} }
+const prefetching=new Set();
+async function prefetchWord(w){
+  w=String(w||'').trim();
+  if(!w || !isWordTts(w) || prefetching.has(w) || !navigator.onLine) return;
+  prefetching.add(w);
+  try{
+    if(await wordCacheGet(w)) return;
+    const token=await getAzureToken(false); if(!token) return;
+    const res=await fetch(`https://${azureRegion}.tts.speech.microsoft.com/cognitiveservices/v1`,{method:'POST',
+      headers:{'Authorization':'Bearer '+token,'Content-Type':'application/ssml+xml','X-Microsoft-OutputFormat':'audio-24khz-48kbitrate-mono-mp3'},
+      body:buildAzureSSML(w),cache:'no-store'});
+    if(res.ok){ const b=new Blob([await res.arrayBuffer()],{type:'audio/mpeg'}); if(b.size>500) await wordCachePut(w,b); }
+  }catch(e){} finally{ prefetching.delete(w); }
+}
 async function azureSpeak(t,cb,options={}){
   const generation=++azureSpeakGeneration;
   const text=String(t||'').trim();
@@ -1819,32 +1936,35 @@ async function azureSpeak(t,cb,options={}){
     if(azureSpeakAbort){ try{azureSpeakAbort.abort();}catch(e){} }
     azureSpeakAbort=new AbortController();
     const controller=azureSpeakAbort;
-    const token=await getAzureToken(false);
+    const wordMode=isWordTts(text);
+    let blob=wordMode ? await wordCacheGet(text) : null;
     if(generation!==azureSpeakGeneration || controller.signal.aborted) return;
-    if(!token) throw new Error('TOKEN_MISSING');
-    const res=await fetch(`https://${azureRegion}.tts.speech.microsoft.com/cognitiveservices/v1`,{
-      method:'POST',
-      headers:{
-        'Authorization':'Bearer '+token,
-        'Content-Type':'application/ssml+xml',
-        'X-Microsoft-OutputFormat':'riff-24khz-16bit-mono-pcm'
-      },
-      body:buildAzureSSML(text),
-      signal:controller.signal,
-      cache:'no-store'
-    });
-    if(generation!==azureSpeakGeneration || controller.signal.aborted) return;
-    if(!res.ok){
-      const e=new Error('TTS_HTTP_'+res.status);
-      throw e;
+    if(!blob){
+      const token=await getAzureToken(false);
+      if(generation!==azureSpeakGeneration || controller.signal.aborted) return;
+      if(!token) throw new Error('TOKEN_MISSING');
+      const res=await fetch(`https://${azureRegion}.tts.speech.microsoft.com/cognitiveservices/v1`,{
+        method:'POST',
+        headers:{
+          'Authorization':'Bearer '+token,
+          'Content-Type':'application/ssml+xml',
+          'X-Microsoft-OutputFormat': wordMode ? 'audio-24khz-48kbitrate-mono-mp3' : 'riff-24khz-16bit-mono-pcm'
+        },
+        body:buildAzureSSML(text),
+        signal:controller.signal,
+        cache:'no-store'
+      });
+      if(generation!==azureSpeakGeneration || controller.signal.aborted) return;
+      if(!res.ok){ throw new Error('TTS_HTTP_'+res.status); }
+      const data=await res.arrayBuffer();
+      if(generation!==azureSpeakGeneration || controller.signal.aborted) return;
+      if(!data || !data.byteLength) throw new Error('TTS_EMPTY_AUDIO');
+      blob=new Blob([data],{type: wordMode ? 'audio/mpeg' : 'audio/wav'});
+      if(wordMode) wordCachePut(text,blob);
     }
-    const data=await res.arrayBuffer();
-    if(generation!==azureSpeakGeneration || controller.signal.aborted) return;
-    if(!data || !data.byteLength) throw new Error('TTS_EMPTY_AUDIO');
-
     if(options.playWhenActive && (!reading || pausedReading)) return;
     if(azureAudioUrl){ try{URL.revokeObjectURL(azureAudioUrl);}catch(e){} }
-    azureAudioUrl=URL.createObjectURL(new Blob([data],{type:'audio/wav'}));
+    azureAudioUrl=URL.createObjectURL(blob);
     try{azureAudio.pause();}catch(e){}
     try{azureAudio.currentTime=0;}catch(e){}
     azureAudio.src=azureAudioUrl;
@@ -1970,7 +2090,8 @@ function finish(){
   const entry={at:Date.now(),textId:TextManager.current.id,textName:TextManager.current.name,accuracy:accuracy(),correct:score,total:words.length,elapsed:elapsedMs()};
   progressHistory.push(entry); saveState(); renderDashboard();
   $('resAccuracy').textContent=entry.accuracy+'%'; $('resTime').textContent=fmtTime(entry.elapsed); $('resWords').textContent=score+'/'+words.length;
-  $('winMsg').textContent='قرأتِ '+words.length+' كلمة وجمعتِ '+score+' نجمة ⭐ — ممتاز!';
+  const badge=entry.accuracy>=90?'🥇 شارة ذهبية':entry.accuracy>=75?'🥈 شارة فضية':'🥉 شارة برونزية'; const st=streakDays();
+  $('winMsg').textContent='قرأتِ '+words.length+' كلمة وجمعتِ '+score+' نجمة ⭐ — '+badge+(st>1?' — 🔥 '+st+' أيام متتالية':'');
   $('win').classList.add('show');
   [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.25),i*140));
   for(let i=0;i<60;i++) confetti();
@@ -2277,7 +2398,7 @@ async function blobToWav16kMono(blob){
 }
 
 async function transcribeWavWithAzure(wav,token){
-  const url=`https://${azureRegion}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=ar-SA&format=detailed`;
+  const url=`https://${azureRegion}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=${window.sttLang('word')}&format=detailed`;
   const res=await fetch(url,{method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'audio/wav; codecs=audio/pcm; samplerate=16000','Accept':'application/json'},body:wav,cache:'no-store'});
   const body=await res.text();
   if(!res.ok) throw new Error('STT_HTTP_'+res.status+(body?' '+body.slice(0,180):''));
@@ -2293,11 +2414,43 @@ async function transcribeWavWithAzure(wav,token){
   return {text,data};
 }
 
+let sdkWordRec=null;
+function resetMicBtn(){ listening=false; const b=$('micBtn'); b.classList.remove('on'); b.textContent='🎤 ابدئي القراءة'; }
+// تعرّف مباشر بالـ SDK: يتوقف تلقائيًا عند الصمت، مع تلميح بالكلمة المطلوبة لرفع الدقة
+async function startMicSDK(token){
+  try{
+    const SDK=await loadAzureSdk(); const tk=await getAzureToken(false);
+    if(token!==micStartToken) return true;
+    const sc=SDK.SpeechConfig.fromAuthorizationToken(tk,azureRegion);
+    sc.speechRecognitionLanguage=window.sttLang('word');
+    try{ sc.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,'6000'); sc.setProperty(SDK.PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs,'800'); }catch(e){}
+    const r=new SDK.SpeechRecognizer(sc,SDK.AudioConfig.fromDefaultMicrophoneInput());
+    try{ const w=stripTashFn(words[idx]||'').replace(/[^\u0621-\u064A\s]/g,'').trim(); if(w) SDK.PhraseListGrammar.fromRecognizer(r).addPhrase(w); }catch(e){}
+    sdkWordRec=r; listening=true;
+    $('micBtn').classList.add('on'); $('micBtn').textContent='⏹ إيقاف';
+    say('🎙 اقرئي الكلمة الآن: '+(words[idx]||''));
+    r.recognizeOnceAsync(res=>{
+      try{r.close();}catch(e){} if(sdkWordRec===r) sdkWordRec=null;
+      if(token!==micStartToken) return;
+      resetMicBtn();
+      const txt=String(res?.text||'').trim();
+      if(txt) handleT(txt); else say('🎤 لم أسمعك بوضوح. قرّبي الجهاز وأعيدي المحاولة.');
+    }, err=>{
+      try{r.close();}catch(e){} if(sdkWordRec===r) sdkWordRec=null;
+      if(token!==micStartToken) return;
+      resetMicBtn(); console.error('SDK word mic error',err);
+      const m=String(err||'');
+      say(/permission|denied|NotAllowed/i.test(m) ? '🎤 اسمحي للمتصفح باستخدام المايك ثم اضغطي مرة أخرى.' : '⚠️ تعذر التعرف على الكلام: '+m);
+    });
+    return true;
+  }catch(e){ console.warn('SDK word mic unavailable, using recorder fallback:',e); return false; }
+}
 async function startMic(){
   const token=++micStartToken;
   if(!window.isSecureContext){say('🔒 يجب فتح الموقع عبر HTTPS حتى يعمل المايك.');return;}
   if(listening)return;
   stopRead();stopMobileMicTracks();
+  if(await startMicSDK(token)) return;
   try{
     if(!navigator.mediaDevices?.getUserMedia) throw new Error('MIC_UNSUPPORTED');
     if(!window.MediaRecorder) throw new Error('RECORDER_UNSUPPORTED');
@@ -2364,6 +2517,7 @@ async function startMic(){
 function stopMic(){
   ++micStartToken;
   listening=false;
+  try{ if(sdkWordRec){ sdkWordRec.close(); sdkWordRec=null; } }catch(e){}
   try{if(mobileMicState.recorder && mobileMicState.recorder.state!=='inactive') mobileMicState.recorder.stop();}catch(e){}
   stopMobileMicTracks();
   $('micBtn').classList.remove('on'); $('micBtn').textContent='🎤 ابدئي القراءة';
@@ -2604,6 +2758,22 @@ $('rateSel').oninput=e=>{ rate=parseFloat(e.target.value); $('rateVal').textCont
 document.querySelectorAll('[data-speed]').forEach(btn=>btn.addEventListener('click',()=>{const v=parseFloat(btn.dataset.speed);rate=v;$('rateSel').value=v;$('rateVal').textContent=v.toFixed(2);}));
 $('noTash').onchange=e=>{ stripTash=e.target.checked; invalidateFullAudioCache(); };
 $('azureVoiceSel').onchange=e=>{azureVoice=e.target.value;saveAzureConfig();};
+(function(){
+  const get=(k,d)=>{ try{ return localStorage.getItem('readingApp.'+k)||d; }catch(e){ return d; } };
+  const set=(k,v)=>{ try{ localStorage.setItem('readingApp.'+k,v); }catch(e){} };
+  const apply=()=>{
+    document.body.classList.remove('sz-l','sz-xl'); const s=get('size','m'); if(s!=='m') document.body.classList.add('sz-'+s);
+    document.body.classList.toggle('hc', get('hc','0')==='1');
+    renderGoal();
+  };
+  const bind=(id,key,def,cb)=>{ const el=$(id); if(!el) return; if(el.type==='checkbox'){ el.checked=get(key,def)==='1'; el.onchange=()=>{ set(key,el.checked?'1':'0'); apply(); }; }
+    else { el.value=get(key,def); el.onchange=()=>{ set(key,el.value); apply(); cb&&cb(); }; } };
+  bind('prefJudge','judge','mid'); bind('prefStt','sttLang','auto'); bind('prefSeg','segment','0');
+  bind('prefSize','size','m'); bind('prefGoal','goal','20'); bind('prefHc','hc','0');
+  apply();
+  // وصولية: اسم نصي لكل زر لا يملك aria-label
+  document.querySelectorAll('button').forEach(b=>{ if(!b.getAttribute('aria-label')){ const l=(b.title||b.textContent||'').trim(); if(l) b.setAttribute('aria-label',l); } });
+})();
 
 $('pausePreset').onchange=e=>{pausePreset=e.target.value;};
 loadAzureConfig();

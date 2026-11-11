@@ -7,7 +7,8 @@ window.READING_APP_CONFIG = window.READING_APP_CONFIG || {
   TOKEN_ENDPOINT: 'https://reading-speech-api-e9hbc8fscfaxacgv.israelcentral-01.azurewebsites.net/api/speech-token',
   REGION: 'eastus',
   VOICE: 'ar-JO-SanaNeural',
-  SDK_URL: 'https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@1.46.0/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js'
+  SDK_URL: './vendor/microsoft.cognitiveservices.speech.sdk.bundle-min.js',
+  SDK_FALLBACK_URL: 'https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@1.46.0/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js'
 };
 
 // أسماء بديلة يستخدمها كل ملف تاريخيًا — تشير كلها لنفس الكائن أعلاه،
